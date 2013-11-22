@@ -24,7 +24,7 @@ var unglob = require('../lib/unglob.js');
 var path = require('path');
 var prelude = fs.readFileSync(__dirname + '/../bundle/prelude.js', 'utf8');
 
-var bundle, browser;
+var bundle, launch, browser;
 var scripts = [];
 var htmlQueue = [];
 var pending = 4;
@@ -197,19 +197,21 @@ if (argv.u || argv.cmd || argv.x || argv.bcmd) {
 else {
     launcher(function (err, launch_) {
         if (err) return console.error(err);
+        launch = launch_;
 
-        if (launch && launch.browsers && launch.browsers.length) {
+        if (launch && launch.browsers && launch.browsers.local && launch.browsers.local.length) {
+            var browsers = launch.browsers.local;
+
             if (process.platform === 'darwin') {
-                launch.browsers = launch.browsers.filter(function (browser) {
-                    return browser.headless;
-                });
-                if (launch.browsers.length === 0) {
+                browsers = browsers.filter(function (b) { return b.headless; });
+                if (browsers.length === 0) {
                     console.error('A headless browser (like PhantomJS) is required to run testling on this '
                         + 'platform. Visit http://phantomjs.org/ for installation instructions.');
                     process.exit(1);
                 }
             }
-            browser = launch.browsers[0];
+
+            browser = browsers[0].name;
         } else {
             console.error('Unable to find any suitable browsers on this system.');
             process.exit(1);

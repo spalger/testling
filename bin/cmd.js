@@ -211,7 +211,11 @@ else {
                 }
             }
 
-            browser = browsers[0].name;
+            if (browsers.filter(function (b) { return b.name === 'phantom'; }).length) {
+                browser = 'phantom';
+            } else {
+                browser = browsers[0].name;
+            }
         } else {
             console.error('Unable to find any suitable browsers on this system.');
             process.exit(1);
